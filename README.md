@@ -1,11 +1,16 @@
 # Codex RTL Fix
 
-This local launcher improves mixed Arabic/English message rendering in the
-Codex Windows app without modifying the signed Microsoft Store package.
+This local launcher improves mixed right-to-left/left-to-right message
+rendering in the Codex Windows app without modifying the signed Microsoft
+Store package.
 
 It applies `dir="auto"` to rendered conversation text and keeps code-like
 surfaces left-to-right. The prompt composer is intentionally left mostly
 unchanged because changing Codex's ProseMirror editor DOM can break sending.
+
+The fix is not Arabic-specific. It is intended for RTL scripts such as Arabic,
+Hebrew, Persian/Farsi, Urdu, Pashto, Sindhi, and other right-to-left languages
+when they are mixed with English, paths, commands, URLs, or code.
 
 ## Install
 
@@ -49,6 +54,27 @@ Version 1.2 يعمل مع النص العربي بشكل صحيح؟
 Arabic prose should flow right-to-left. Paths, commands, URLs, and code should
 remain left-to-right.
 
+Additional RTL-language checks:
+
+```text
+בדיקה בעברית mixed with English and version 1.2
+```
+
+```text
+این یک تست فارسی mixed with English است.
+```
+
+```text
+یہ اردو test mixed with English ہے.
+```
+
+## Agent Usage
+
+If you are a Codex agent helping someone use or maintain this project, read
+[`docs/CODEX_APP_AGENT_USAGE.md`](docs/CODEX_APP_AGENT_USAGE.md) first. It
+contains the exact install, restart, validation, and troubleshooting workflow
+for the Codex Windows app.
+
 ## Validate
 
 ```powershell
@@ -63,4 +89,5 @@ structure, the injector may need a small selector adjustment.
 
 Prompt composer support is intentionally conservative. A direct ProseMirror
 patch was tested and removed because it could make Codex unable to send
-messages.
+messages. Track future work in the issue named "Investigate safe RTL support
+for prompt composer".

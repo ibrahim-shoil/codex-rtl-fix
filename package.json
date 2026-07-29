@@ -2,7 +2,7 @@
   "name": "codex-rtl-fix",
   "version": "0.1.0",
   "private": false,
-  "description": "Mixed Arabic-English message rendering fix for the Codex Windows app",
+  "description": "Mixed RTL/LTR message rendering fix for the Codex Windows app",
   "type": "module",
   "scripts": {
     "check": "node --check cdp-client.mjs && node --check rtl-payload.mjs && node --check rtl-injector.mjs && node --check rtl-apply-once.mjs && node --check rtl-diagnose.mjs",
