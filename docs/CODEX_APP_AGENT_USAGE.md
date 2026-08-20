@@ -86,9 +86,12 @@ Launch the app with `Invoke-CommandInDesktopPackage` using:
 Invoke-CommandInDesktopPackage `
   -PackageFamilyName OpenAI.Codex_2p2nqsd0c76g0 `
   -AppId App `
-  -Command "app\ChatGPT.exe" `
+  -Command "ChatGPT.exe" `
   -Args "--remote-debugging-address=127.0.0.1 --remote-debugging-port=<port> --remote-allow-origins=http://127.0.0.1:<port>"
 ```
+
+Do not pass `app\ChatGPT.exe` here. In this packaged-app launch context that
+path can produce a Windows dialog saying it cannot find `app\ChatGPT.exe`.
 
 When debugging a failed launch, do not assume the failure is the same as the
 previous one. Read `rtl-launcher-debug.log` first. It records:

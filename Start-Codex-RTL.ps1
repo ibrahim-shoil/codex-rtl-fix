@@ -109,11 +109,11 @@ function Start-CodexPackagedApp {
     )
 
     $argString = $Arguments -join " "
-    Write-DebugLog "launcher: packageLaunch packageFamilyName=$PackageFamilyName appId=App command=app\ChatGPT.exe args=$argString"
+    Write-DebugLog "launcher: packageLaunch packageFamilyName=$PackageFamilyName appId=App command=ChatGPT.exe args=$argString"
     Invoke-CommandInDesktopPackage `
         -PackageFamilyName $PackageFamilyName `
         -AppId "App" `
-        -Command "app\ChatGPT.exe" `
+        -Command "ChatGPT.exe" `
         -Args $argString
 }
 
