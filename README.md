@@ -27,6 +27,8 @@ Then:
 3. Use **Codex RTL** for future launches.
 4. If a bad launch happens, run **Stop Codex RTL**, then open **Codex RTL**
    again.
+5. If it still fails, run **Diagnose Codex RTL** and inspect
+   `rtl-launcher-debug.log`.
 
 The launcher resolves the currently installed Codex package every time, so it
 does not depend on a specific app version. It does not alter `app.asar`.

@@ -1,5 +1,6 @@
 node_modules/
 *.log
+rtl-diagnose-summary.json
 .node-test.out
 .node-test.err
 .rtl-probe-profile/

@@ -38,6 +38,7 @@ This creates two shortcuts on the Desktop and in the Start menu:
 
 - `Codex RTL`
 - `Stop Codex RTL`
+- `Diagnose Codex RTL`
 
 Tell the user to launch Codex with `Codex RTL`, not the normal Codex shortcut.
 
@@ -54,8 +55,17 @@ If the app opens dark, hangs, or behaves incorrectly:
 1. Run `Stop Codex RTL`.
 2. Open `Codex RTL` again.
 3. Inspect:
+   - `rtl-launcher-debug.log`
+   - `rtl-stop-debug.log`
    - `rtl-injector.log`
    - `rtl-injector.err.log`
+
+Run `Diagnose Codex RTL` or this command to collect the current process state
+and all RTL logs without stopping Codex:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Diagnose-Codex-RTL.ps1
+```
 
 If Windows shows `Access is denied` while stopping or relaunching Codex, it is
 usually a protected or already-exiting helper process. The stop/relaunch scripts
@@ -67,6 +77,29 @@ line. A working launch has `--remote-debugging-port=<port>` on the main
 did not close before relaunch and Electron reused the existing normal instance.
 The launcher should stop the main Codex process tree first and wait until the
 main process exits before starting the RTL instance.
+
+Packaged Codex installs can reject direct `Start-Process` calls against
+`C:\Program Files\WindowsApps\...\app\ChatGPT.exe` with `Access is denied`.
+Launch the app with `Invoke-CommandInDesktopPackage` using:
+
+```powershell
+Invoke-CommandInDesktopPackage `
+  -PackageFamilyName OpenAI.Codex_2p2nqsd0c76g0 `
+  -AppId App `
+  -Command "app\ChatGPT.exe" `
+  -Args "--remote-debugging-address=127.0.0.1 --remote-debugging-port=<port> --remote-allow-origins=http://127.0.0.1:<port>"
+```
+
+When debugging a failed launch, do not assume the failure is the same as the
+previous one. Read `rtl-launcher-debug.log` first. It records:
+
+- detected Codex processes and their command lines
+- `taskkill` output and exit codes
+- whether the user approved relaunch
+- whether the main Codex process actually exited
+- selected DevTools port
+- injector PID
+- launched app PID and launch flags
 
 ## Validation
 

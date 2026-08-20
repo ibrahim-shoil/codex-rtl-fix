@@ -31,6 +31,24 @@ foreach ($file in $syntaxFiles) {
     }
 }
 
+foreach ($script in @(
+    "Start-Codex-RTL.ps1",
+    "Stop-Codex-RTL.ps1",
+    "Install-Codex-RTL.ps1",
+    "Diagnose-Codex-RTL.ps1"
+)) {
+    $tokens = $null
+    $parseErrors = $null
+    $null = [System.Management.Automation.Language.Parser]::ParseFile(
+        (Join-Path $PSScriptRoot $script),
+        [ref]$tokens,
+        [ref]$parseErrors
+    )
+    if ($parseErrors.Count -gt 0) {
+        throw "PowerShell syntax check failed: $script"
+    }
+}
+
 $process = Start-Process `
     -FilePath $nodeExe `
     -ArgumentList @((Join-Path $PSScriptRoot "test-rtl-payload.mjs")) `

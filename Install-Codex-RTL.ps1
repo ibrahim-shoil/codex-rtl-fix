@@ -13,6 +13,10 @@ $stopper = Join-Path $PSScriptRoot "Stop-Codex-RTL.ps1"
 if (-not (Test-Path -LiteralPath $stopper)) {
     throw "Stopper not found: $stopper"
 }
+$diagnoser = Join-Path $PSScriptRoot "Diagnose-Codex-RTL.ps1"
+if (-not (Test-Path -LiteralPath $diagnoser)) {
+    throw "Diagnoser not found: $diagnoser"
+}
 
 $desktop = [Environment]::GetFolderPath("Desktop")
 $startMenu = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs"
@@ -22,7 +26,8 @@ $shell = New-Object -ComObject WScript.Shell
 
 foreach ($shortcutSpec in @(
     @{ Name = "Codex RTL.lnk"; Script = $launcher; Description = "Start Codex with automatic Arabic and English bidirectional text" },
-    @{ Name = "Stop Codex RTL.lnk"; Script = $stopper; Description = "Stop Codex and the RTL injector" }
+    @{ Name = "Stop Codex RTL.lnk"; Script = $stopper; Description = "Stop Codex and the RTL injector" },
+    @{ Name = "Diagnose Codex RTL.lnk"; Script = $diagnoser; Description = "Print Codex RTL process and log diagnostics" }
 )) {
     foreach ($directory in @($desktop, $startMenu)) {
     $shortcutPath = Join-Path $directory $shortcutSpec.Name
@@ -36,4 +41,4 @@ foreach ($shortcutSpec in @(
     }
 }
 
-Write-Output "Installed Codex RTL and Stop Codex RTL shortcuts on the Desktop and in the Start menu."
+Write-Output "Installed Codex RTL, Stop Codex RTL, and Diagnose Codex RTL shortcuts on the Desktop and in the Start menu."
