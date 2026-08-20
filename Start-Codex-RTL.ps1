@@ -29,13 +29,31 @@ function Confirm-RtlRestart {
     return $result -eq [System.Windows.Forms.DialogResult]::Yes
 }
 
+function Stop-CodexProcesses {
+    Get-CimInstance Win32_Process |
+        Where-Object {
+            $_.Name -eq "ChatGPT.exe" -or
+            ($_.Name -eq "node.exe" -and $_.CommandLine -like "*rtl-injector.mjs*")
+        } |
+        Sort-Object ParentProcessId -Descending |
+        ForEach-Object {
+            try {
+                Stop-Process -Id $_.ProcessId -Force -ErrorAction Stop
+            } catch {
+                # Some child processes can exit between enumeration and stop, or
+                # Windows can deny access to protected helper processes. The
+                # relaunch only needs best-effort cleanup.
+            }
+        }
+}
+
 try {
     $running = Get-Process -Name "ChatGPT" -ErrorAction SilentlyContinue
     if ($running -and -not $ValidateOnly) {
         if (-not (Confirm-RtlRestart)) {
             exit 1
         }
-        $running | Stop-Process -Force
+        Stop-CodexProcesses
         Start-Sleep -Milliseconds 1500
     }
 
