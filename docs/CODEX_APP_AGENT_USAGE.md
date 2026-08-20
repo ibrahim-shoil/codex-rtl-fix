@@ -57,6 +57,10 @@ If the app opens dark, hangs, or behaves incorrectly:
    - `rtl-injector.log`
    - `rtl-injector.err.log`
 
+If Windows shows `Access is denied` while stopping or relaunching Codex, it is
+usually a protected or already-exiting helper process. The stop/relaunch scripts
+should treat process cleanup as best effort and continue when possible.
+
 ## Validation
 
 Run:
