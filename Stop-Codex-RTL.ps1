@@ -7,10 +7,13 @@ try {
             $_.Name -eq "ChatGPT.exe" -or
             ($_.Name -eq "node.exe" -and $_.CommandLine -like "*rtl-injector.mjs*")
         } |
+        Sort-Object ParentProcessId -Descending |
         ForEach-Object {
             try {
                 Stop-Process -Id $_.ProcessId -Force -ErrorAction Stop
-            } catch {}
+            } catch {
+                # Best effort: a helper process may already be gone or protected.
+            }
         }
 
     [System.Windows.Forms.MessageBox]::Show(
