@@ -61,6 +61,13 @@ If Windows shows `Access is denied` while stopping or relaunching Codex, it is
 usually a protected or already-exiting helper process. The stop/relaunch scripts
 should treat process cleanup as best effort and continue when possible.
 
+If `Codex RTL` opens the normal app without RTL, inspect the process command
+line. A working launch has `--remote-debugging-port=<port>` on the main
+`ChatGPT.exe` process. If the main process has no remote-debugging flags, Codex
+did not close before relaunch and Electron reused the existing normal instance.
+The launcher should stop the main Codex process tree first and wait until the
+main process exits before starting the RTL instance.
+
 ## Validation
 
 Run:

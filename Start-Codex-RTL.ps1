@@ -30,21 +30,43 @@ function Confirm-RtlRestart {
 }
 
 function Stop-CodexProcesses {
-    Get-CimInstance Win32_Process |
-        Where-Object {
-            $_.Name -eq "ChatGPT.exe" -or
-            ($_.Name -eq "node.exe" -and $_.CommandLine -like "*rtl-injector.mjs*")
-        } |
-        Sort-Object ParentProcessId -Descending |
+    $processes = Get-CimInstance Win32_Process |
+        Where-Object { $_.Name -eq "ChatGPT.exe" -or ($_.Name -eq "node.exe" -and $_.CommandLine -like "*rtl-injector.mjs*") }
+
+    $roots = $processes |
+        Where-Object { $_.Name -eq "ChatGPT.exe" -and $_.CommandLine -notlike "* --type=*" }
+
+    foreach ($process in $roots) {
+        try {
+            & taskkill.exe /PID $process.ProcessId /T /F 2>$null | Out-Null
+        } catch {
+            # Best effort. A later wait verifies whether the main process exited.
+        }
+    }
+
+    $processes |
+        Where-Object { $_.Name -eq "node.exe" -and $_.CommandLine -like "*rtl-injector.mjs*" } |
         ForEach-Object {
             try {
                 Stop-Process -Id $_.ProcessId -Force -ErrorAction Stop
-            } catch {
-                # Some child processes can exit between enumeration and stop, or
-                # Windows can deny access to protected helper processes. The
-                # relaunch only needs best-effort cleanup.
-            }
+            } catch {}
         }
+}
+
+function Wait-CodexClosed {
+    param([int]$TimeoutSeconds = 12)
+
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    do {
+        $main = Get-CimInstance Win32_Process |
+            Where-Object { $_.Name -eq "ChatGPT.exe" -and $_.CommandLine -notlike "* --type=*" }
+        if (-not $main) {
+            return $true
+        }
+        Start-Sleep -Milliseconds 300
+    } while ((Get-Date) -lt $deadline)
+
+    return $false
 }
 
 try {
@@ -54,7 +76,12 @@ try {
             exit 1
         }
         Stop-CodexProcesses
-        Start-Sleep -Milliseconds 1500
+        if (-not (Wait-CodexClosed)) {
+            Show-RtlMessage `
+                -Text "Codex did not close completely. Quit Codex from the system tray, then open Codex RTL again." `
+                -Icon ([System.Windows.Forms.MessageBoxIcon]::Warning)
+            exit 1
+        }
     }
 
     $package = Get-AppxPackage -Name "OpenAI.Codex"
